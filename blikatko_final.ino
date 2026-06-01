@@ -58,20 +58,31 @@ void goToSleep(){
   GIMSK = (1 << PCIE);
   PCMSK = (1 << PCINT4);
 
+  power_adc_disable();
+  power_timer1_disable();
+  power_usi_disable();
+
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   cli();
+  GIFR |= (1 << PCIF);
   sleep_enable();
 
-#if defined(BODS) && defined(BODSE)
-  MCUCR = (1 << BODS) | (1 << BODSE);
-  MCUCR = (MCUCR & ~(1 << BODSE)) | (1 << BODS);
-#endif
+// #if defined(BODS) && defined(BODSE)
+//  MCUCR = (1 << BODS) | (1 << BODSE);
+//  MCUCR = (MCUCR & ~(1 << BODSE)) | (1 << BODS);
+// #endif
+
+// digitalWrite(LED1, HIGH);
+// delay(1000);
 
   sei();
   sleep_cpu();
 
   sleep_disable();
   PCMSK &= ~(1 << PCINT4);
+
+power_adc_enable();
+
   wakeUpFlag=false;
 }
 
